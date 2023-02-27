@@ -1,6 +1,7 @@
 
 
 import javax.swing.JOptionPane;
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 
 public class ChessGameEngineProduct {
@@ -130,9 +131,17 @@ public class ChessGameEngineProduct {
 	* @param endGameStr the string to display to the user (i.e. stalemate, checkmate, etc)
 	*/
 	public void askUserToPlayAgain(String endGameStr, ChessGameEngine chessGameEngine) {
+		board(endGameStr);
 		int resp = JOptionPane.showConfirmDialog(board.getParent(), endGameStr + " Do you want to play again?");
 		if (resp == JOptionPane.YES_OPTION) {
 			reset(chessGameEngine);
+		} else {
+		}
+	}
+
+	private void board(String endGameStr) throws HeadlessException {
+		int resp = JOptionPane.showConfirmDialog(board.getParent(), endGameStr + " Do you want to play again?");
+		if (resp == JOptionPane.YES_OPTION) {
 		} else {
 			board.resetBoard(false);
 		}

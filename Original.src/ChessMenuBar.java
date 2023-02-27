@@ -94,14 +94,22 @@ public class ChessMenuBar
     private void exitHandler(){
         JOptionPane.showMessageDialog( this.getParent(), "Thanks for leaving"
             + ", quitter! >:(" );
-        Component possibleFrame = this;
-        while ( possibleFrame != null && !( possibleFrame instanceof JFrame ) ){
-            possibleFrame = possibleFrame.getParent();
-        }
-        JFrame frame = (JFrame)possibleFrame;
-        frame.setVisible( false );
-        frame.dispose();
+        JFrame frame = frame();
+		frame.dispose();
     }
+	private JFrame frame() {
+		Component possibleFrame = possibleFrame();
+		JFrame frame = (JFrame) possibleFrame;
+		frame.setVisible(false);
+		return frame;
+	}
+	private Component possibleFrame() {
+		Component possibleFrame = this;
+		while (possibleFrame != null && !(possibleFrame instanceof JFrame)) {
+			possibleFrame = possibleFrame.getParent();
+		}
+		return possibleFrame;
+	}
     /**
      * Takes an appropriate action if the toggle graveyard button is clicked.
      */

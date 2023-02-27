@@ -1,3 +1,4 @@
+import java.awt.HeadlessException;
 import javax.swing.*;
 // -------------------------------------------------------------------------
 /**
@@ -17,10 +18,15 @@ public class ChessMain{
      *            command line arguments, not used
      */
     public static void main( String[] args ){
-        JFrame frame = new JFrame( "YetAnotherChessGame 1.0" );
-        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        frame.getContentPane().add( new ChessPanel() );
-        frame.pack();
-        frame.setVisible( true );
+        JFrame frame = frame();
+		frame.getContentPane().add( new ChessPanel() );
     }
+
+	private static JFrame frame() throws HeadlessException {
+		JFrame frame = new JFrame("YetAnotherChessGame 1.0");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+		return frame;
+	}
 }

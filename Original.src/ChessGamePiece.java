@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 // -------------------------------------------------------------------------
 /**
  * Abstract class that is used to represent a game piece on the chess board.
@@ -15,7 +16,7 @@ import javax.swing.ImageIcon;
  */
 public abstract class ChessGamePiece{
     private boolean             skipMoveGeneration;
-    private int                 pieceColor;
+    private PieceColor                 pieceColor;
     private ImageIcon           pieceImage;
     /**
      * The list of possible moves for this piece. Updated when actions involving
@@ -33,11 +34,11 @@ public abstract class ChessGamePiece{
     /**
      * Represents a black piece as an int
      */
-    static final int            BLACK      = 0;
+    public static final int            BLACK      = 0;
     /**
      * Represents a white piece as an int
      */
-    static final int            WHITE      = 1;
+    public static final int            WHITE      = 1;
     /**
      * Represents a piece that has not been assigned a color
      */
@@ -61,7 +62,7 @@ public abstract class ChessGamePiece{
         int col,
         int pieceColor ){
         skipMoveGeneration = false;
-        this.pieceColor = pieceColor;
+        this.setPieceColor(pieceColor);
         pieceImage = createImageByPieceType();
         pieceRow = row;
         pieceColumn = col;
@@ -94,7 +95,7 @@ public abstract class ChessGamePiece{
         int pieceColor,
         boolean skipMoveGeneration ){
         this.skipMoveGeneration = skipMoveGeneration;
-        this.pieceColor = pieceColor;
+        this.setPieceColor(pieceColor);
         pieceImage = this.createImageByPieceType();
         pieceRow = row;
         pieceColumn = col;
@@ -203,10 +204,10 @@ public abstract class ChessGamePiece{
         int count = 0;
         if ( isPieceOnScreen() ){
             for ( int i = pieceColumn + 1; i < 8 && count < numMoves; i++ ){
-                if ( ( board.getCell( pieceRow, i ).getPieceOnSquare()
+                count = count(board, count, i);
+				if ( ( board.getCell( pieceRow, i ).getPieceOnSquare()
                     == null || isEnemy( board, pieceRow, i ) ) ){
                     moves.add( pieceRow + "," + i );
-                    count++;
                     if ( isEnemy( board, pieceRow, i ) ){
                         break;
                     }
@@ -219,6 +220,13 @@ public abstract class ChessGamePiece{
         }
         return moves;
     }
+	private int count(ChessGameBoard board, int count, int i) {
+		if ((board.getCell(pieceRow, i).getPieceOnSquare() == null || isEnemy(board, pieceRow, i))) {
+			count++;
+		} else {
+		}
+		return count;
+	}
     // ----------------------------------------------------------
     /**
      * Calculates and returns moves in the west direction relative to this
@@ -424,7 +432,7 @@ public abstract class ChessGamePiece{
      *         unassigned piece.
      */
     public int getColorOfPiece(){
-        return pieceColor;
+        return pieceColor.getColorOfPiece();
     }
     // ----------------------------------------------------------
     /**
@@ -471,19 +479,8 @@ public abstract class ChessGamePiece{
             String moveLog = this.toString() + " -> ";
             board.clearCell( pieceRow, pieceColumn );
             if ( isEnemy( board, row, col ) ){
-                ChessGraveyard graveyard;
-                ChessGameEngine gameEngine =
-                    ( (ChessPanel)board.getParent() ).getGameEngine();
-                if ( gameEngine.getCurrentPlayer() == 1 ){
-                    graveyard =
-                        ( (ChessPanel)board.getParent() ).getGraveyard( 2 );
-                }
-                else
-                {
-                    graveyard =
-                        ( (ChessPanel)board.getParent() ).getGraveyard( 1 );
-                }
-                graveyard.addPiece(
+                ChessGraveyard graveyard = graveyard(board);
+				graveyard.addPiece(
                     board.getCell( row, col ).getPieceOnSquare() );
             }
             setPieceLocation( row, col );
@@ -500,6 +497,16 @@ public abstract class ChessGamePiece{
             return false;
         }
     }
+	private ChessGraveyard graveyard(ChessGameBoard board) {
+		ChessGraveyard graveyard;
+		ChessGameEngine gameEngine = ((ChessPanel) board.getParent()).getGameEngine();
+		if (gameEngine.getCurrentPlayer() == 1) {
+			graveyard = ((ChessPanel) board.getParent()).getGraveyard(2);
+		} else {
+			graveyard = ((ChessPanel) board.getParent()).getGraveyard(1);
+		}
+		return graveyard;
+	}
     /**
      * Determines if this piece can move to the specified row and column. Also
      * checks if the current player's king would be put in check by this move.
@@ -675,25 +682,7 @@ public abstract class ChessGamePiece{
             || enemyPiece.getColorOfPiece() == ChessGamePiece.UNASSIGNED ){
             return false;
         }
-        if ( this.getColorOfPiece() == ChessGamePiece.WHITE ){
-            if ( enemyPiece.getColorOfPiece() == ChessGamePiece.BLACK ){
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            if ( enemyPiece.getColorOfPiece() == ChessGamePiece.WHITE ){
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        return pieceColor.isEnemy(enemyPiece, this);
     }
     // ----------------------------------------------------------
     /**
@@ -735,4 +724,15 @@ public abstract class ChessGamePiece{
         return this.getClass().toString().substring( 6 ) + " @ (" + pieceRow
             + ", " + pieceColumn + ")";
     }
+	public void setPieceColor(int pieceColor) {
+		if (pieceColor == WHITE)
+			this.pieceColor = new White();
+		this.pieceColor = null;
+	}
+	public JLabel pieceLabel() {
+		setPieceLocation(-1, -1);
+		JLabel pieceLabel = new JLabel();
+		pieceLabel.setIcon(getImage());
+		return pieceLabel;
+	}
 }

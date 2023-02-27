@@ -40,14 +40,19 @@ public class BoardSquare
         if ( imageLabel != null ){
             removeAll();
         }
-        if ( piece != null ){
-            imageLabel = new JLabel();
-            imageLabel.setIcon( piece.getImage() );
+        imageLabel();
+		if ( piece != null ){
             add( imageLabel );     
         }
         revalidate(); // repaint wasn't working, gotta force the window manager
         // to redraw...
     }
+	private void imageLabel() {
+		if (piece != null) {
+			imageLabel = new JLabel();
+			imageLabel.setIcon(piece.getImage());
+		}
+	}
     // ----------------------------------------------------------
     /**
      * Gets the row number.
